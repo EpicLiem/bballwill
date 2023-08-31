@@ -14,8 +14,9 @@ def register(name):
     <h1>It worked. You have been registered as {name}.</h1>
     <h1>The next step is to pay to lock in your spot.</h1>
     <a href=\"https:\/\/venmo.com\/u\/will_luttrell\"><h1>Venmo</h1></a>
-    <a href=\"https:\/\/cash\.app\/\$luttrellwill\"><h1>Cash App</h1></a>
+    <a href=\"https:\/\/cash.app/$luttrellwill\""><h1>Cash App</h1></a>
     """
+
 
 @app.route("/player/remove/<name>")
 def remove(name):
