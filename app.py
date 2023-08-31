@@ -11,10 +11,32 @@ def register(name):
     ts = datetime.datetime.utcnow()
     playerlist.append({"name": name, "time": str(ts), "useragent": request.headers.get('User-Agent')})
     return f"""
-    <h1>It worked. You have been registered as {name}.</h1>
-    <h1>The next step is to pay to lock in your spot.</h1>
-    <a href=\"https:\/\/venmo.com\/u\/will_luttrell\"><h1>Venmo</h1></a>
-    <a href=\"https:\/\/cash.app/$luttrellwill\""><h1>Cash App</h1></a>
+    <html>
+        <head>
+            <title>Registration</title>
+            <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Courier+Prime">
+
+            <style>
+            body {{
+                    background-color: #1e1e1e;
+                }}
+                h1 {{
+                    color: white;
+                    font-family: 'Courier Prime', monospace;
+                    text-align: center;
+                }}
+            </style>
+        
+        <body>      
+            <h1>It worked. You have been registered as {name}.</h1>
+            <h1>The next step is to pay to lock in your spot.</h1>
+            <a href=\"https:\/\/venmo.com\/u\/will_luttrell\"><h1>Venmo</h1></a>
+            <a href=\"https:\/\/cash.app/$luttrellwill\""><h1>Cash App</h1></a>
+            <a href=\"https:\/\/www.paypal.com/paypalme/paywillnowplease\""><h1>Paypal</h1></a>
+            <a href=\"sms:+12014460400""><h1>Apple Pay</h1></a>
+        <body>
+    <html>
     """
 
 
