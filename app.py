@@ -31,10 +31,10 @@ def register(name):
         <body>      
             <h1>It worked. You have been registered as {name}.</h1>
             <h1>The next step is to pay to lock in your spot.</h1>
-            <a href=\"https:\/\/venmo.com\/u\/will_luttrell\"><h1>Venmo</h1></a>
-            <a href=\"https:\/\/cash.app/$luttrellwill\""><h1>Cash App</h1></a>
-            <a href=\"https:\/\/www.paypal.com/paypalme/paywillnowplease\""><h1>Paypal</h1></a>
-            <a href=\"sms:+12014460400""><h1>Apple Pay</h1></a>
+            <a href=\"https:\/\/venmo.com\/u\/will_luttrell\" target="_blank"><h1>Venmo</h1></a>
+            <a href=\"https:\/\/cash.app/$luttrellwill\"" target="_blank"><h1>Cash App</h1></a>
+            <a href=\"https:\/\/www.paypal.com/paypalme/paywillnowplease\"" target="_blank"><h1>Paypal</h1></a>
+            <a href=\"sms:+12014460400"" target="_blank"><h1>Apple Pay</h1></a>
         <body>
     <html>
     """
