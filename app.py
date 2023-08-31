@@ -10,7 +10,7 @@ playerlist = []
 def register(name):
     ts = datetime.datetime.utcnow()
     playerlist.append({"name": name, "time": str(ts), "useragent": request.headers.get('User-Agent')})
-    return f"<h1>It worked. You have been registered as {name}. The next step is to pay to lock in your spot.</h1>"
+    return f"""<h1>It worked. You have been registered as {name}.</h1><h1>The next step is to pay to lock in your spot.</h1>"""
 
 @app.route("/player/remove/<name>")
 def remove(name):
