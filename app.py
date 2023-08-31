@@ -15,6 +15,8 @@ def register(name):
     <h1>The next step is to pay to lock in your spot.</h1>
     <a href=\"https:\/\/venmo.com\/u\/will_luttrell\"><h1>Venmo</h1></a>
     <a href=\"https:\/\/cash.app/$luttrellwill\""><h1>Cash App</h1></a>
+    <a href=\"https:\/\/www.paypal.com/paypalme/paywillnowplease\""><h1>Paypal</h1></a>
+    <a href=\"tel:+12014460400""><h1>Apple Pay</h1></a>
     """
 
 
