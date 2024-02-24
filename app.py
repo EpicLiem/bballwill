@@ -52,9 +52,14 @@ def remove(name):
 
 @app.route("/will/list")
 def list():
-    return str(playerlist)
+    return f"""{str(playerlist)}
+    <form action="/will/resetv2" method="post">
+        <input type="submit" name="reset" value="reset" />
+    </form>
 
-@app.route("/will/reset")
+    """
+
+@app.route("/will/resetv2", methods = ['POST'])
 def reset():
     playerlist.clear()
     return "wiped list"
