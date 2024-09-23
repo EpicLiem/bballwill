@@ -64,13 +64,22 @@ def pretty_list():
     if not playerlist:
         return "<h1>No players registered yet.</h1>"
     
+    import pytz
+    from datetime import datetime
+
+    eastern_tz = pytz.timezone('US/Eastern')
+    
     formatted_list = ""
     for index, player in enumerate(playerlist, 1):
+        utc_time = datetime.strptime(player['time'], '%Y-%m-%d %H:%M:%S.%f')
+        utc_time = utc_time.replace(tzinfo=pytz.UTC)
+        eastern_time = utc_time.astimezone(eastern_tz)
+        
         formatted_list += f"""
         <h2>Player {index}:</h2>
         <ul>
             <li><strong>Name:</strong> {player['name']}</li>
-            <li><strong>Registration Time:</strong> {player['time']}</li>
+            <li><strong>Registration Time (ET):</strong> {eastern_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')}</li>
             <li><strong>User Agent:</strong> {player['useragent']}</li>
         </ul>
         <hr>
