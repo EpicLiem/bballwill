@@ -59,6 +59,62 @@ def list():
 
     """
 
+@app.route("/will/pretty")
+def pretty_list():
+    if not playerlist:
+        return "<h1>No players registered yet.</h1>"
+    
+    formatted_list = ""
+    for index, player in enumerate(playerlist, 1):
+        formatted_list += f"""
+        <h2>Player {index}:</h2>
+        <ul>
+            <li><strong>Name:</strong> {player['name']}</li>
+            <li><strong>Registration Time:</strong> {player['time']}</li>
+            <li><strong>User Agent:</strong> {player['useragent']}</li>
+        </ul>
+        <hr>
+        """
+    
+    return f"""
+    <html>
+        <head>
+            <title>Pretty Player List</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }}
+                h1 {{
+                    color: #333;
+                    text-align: center;
+                }}
+                ul {{
+                    list-style-type: none;
+                    padding-left: 0;
+                }}
+                li {{
+                    margin-bottom: 5px;
+                }}
+                hr {{
+                    border: 0;
+                    border-top: 1px solid #ddd;
+                    margin: 20px 0;
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>Registered Players</h1>
+            {formatted_list}
+            <form action="/will/resetv2" method="post">
+                <input type="submit" name="reset" value="Reset List" />
+            </form>
+        </body>
+    </html>
+    """
+
 @app.route("/will/resetv2", methods = ['POST'])
 def reset():
     playerlist.clear()
