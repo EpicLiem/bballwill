@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 import datetime
+import json
 
 app = Flask(__name__)
 
@@ -52,11 +53,13 @@ def remove(name):
 
 @app.route("/will/list")
 def list():
-    return f"""{str(playerlist)}
+    import json
+    formatted_list = json.dumps(playerlist, indent=4)
+    return f"""
+    <pre>{formatted_list}</pre>
     <form action="/will/resetv2" method="post">
         <input type="submit" name="reset" value="reset" />
     </form>
-
     """
 
 @app.route("/will/resetv2", methods = ['POST'])
@@ -65,5 +68,4 @@ def reset():
     return "wiped list"
 
 if __name__ == "__main__":
-    app.run(port=8080, debug=True)
-
+    app.run()
