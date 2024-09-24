@@ -8,20 +8,24 @@ playerlist = []
 
 @app.route("/player/register/<name>")
 def register(name):
-    # Get the UNIX timestamp from query parameters, or default to current UTC time
-    time_str = request.args.get('time', None)
+    # Get the UNIX timestamp from query parameters, or default to epoch time (0)
+    time_str = request.args.get('time', '0')
     
-    if time_str:
-        # Parse the provided UNIX timestamp
-        try:
-            ts = datetime.datetime.utcfromtimestamp(int(time_str))
-        except ValueError:
-            return "Invalid UNIX timestamp. Provide the time in seconds since epoch."
-    else:
-        # Use current UTC time if no time is provided
-        ts = datetime.datetime.utcnow()
+    try:
+        # Parse the provided or default UNIX timestamp
+        time_sent = datetime.datetime.utcfromtimestamp(int(time_str))
+    except ValueError:
+        return "Invalid UNIX timestamp. Provide the time in seconds since epoch."
 
-    playerlist.append({"name": name, "time": str(ts), "useragent": request.headers.get('User-Agent')})
+    # Use current UTC time for the actual registration time
+    ts = datetime.datetime.utcnow()
+
+    playerlist.append({
+        "name": name,
+        "time": str(ts),
+        "time_sent": str(time_sent),
+        "useragent": request.headers.get('User-Agent')
+    })
     
     return f"""
     <html>
@@ -52,7 +56,6 @@ def register(name):
         <body>
     <html>
     """
-
 
 @app.route("/player/remove/<name>")
 def remove(name):
@@ -96,11 +99,21 @@ def pretty_list():
         utc_time = utc_time.replace(tzinfo=pytz.UTC)
         eastern_time = utc_time.astimezone(eastern_tz)
         
+        time_sent = player['time_sent']
+        if time_sent != "N/A":
+            time_sent = parse_time(time_sent)
+            time_sent = time_sent.replace(tzinfo=pytz.UTC)
+            time_sent = time_sent.astimezone(eastern_tz)
+            time_sent_str = time_sent.strftime('%Y-%m-%d %I:%M:%S %p %Z')
+        else:
+            time_sent_str = "N/A"
+        
         formatted_list += f"""
         <h2>Player {index}:</h2>
         <ul>
             <li><strong>Name:</strong> {player['name']}</li>
             <li><strong>Registration Time (ET):</strong> {eastern_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')}</li>
+            <li><strong>Time Sent (ET):</strong> {time_sent_str}</li>
             <li><strong>User Agent:</strong> {player['useragent']}</li>
         </ul>
         <hr>
