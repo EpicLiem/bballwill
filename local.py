@@ -8,8 +8,21 @@ playerlist = []
 
 @app.route("/player/register/<name>")
 def register(name):
-    ts = datetime.datetime.utcnow()
+    # Get the UNIX timestamp from query parameters, or default to current UTC time
+    time_str = request.args.get('time', None)
+    
+    if time_str:
+        # Parse the provided UNIX timestamp
+        try:
+            ts = datetime.datetime.utcfromtimestamp(int(time_str))
+        except ValueError:
+            return "Invalid UNIX timestamp. Provide the time in seconds since epoch."
+    else:
+        # Use current UTC time if no time is provided
+        ts = datetime.datetime.utcnow()
+
     playerlist.append({"name": name, "time": str(ts), "useragent": request.headers.get('User-Agent')})
+    
     return f"""
     <html>
         <head>
@@ -69,9 +82,17 @@ def pretty_list():
 
     eastern_tz = pytz.timezone('US/Eastern')
     
+    def parse_time(time_str):
+        for fmt in ('%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S'):
+            try:
+                return datetime.strptime(time_str, fmt)
+            except ValueError:
+                pass
+        raise ValueError(f"Time data '{time_str}' does not match any known format")
+    
     formatted_list = ""
     for index, player in enumerate(playerlist, 1):
-        utc_time = datetime.strptime(player['time'], '%Y-%m-%d %H:%M:%S.%f')
+        utc_time = parse_time(player['time'])
         utc_time = utc_time.replace(tzinfo=pytz.UTC)
         eastern_time = utc_time.astimezone(eastern_tz)
         
