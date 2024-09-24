@@ -9,7 +9,7 @@ playerlist = []
 @app.route("/player/register/<name>")
 def register(name):
     # Get the UNIX timestamp from query parameters, or default to epoch time (0)
-    time_str = request.args.get('time', '0')
+    time_str = request.args.get('uid', '0')
     
     try:
         # Parse the provided or default UNIX timestamp
