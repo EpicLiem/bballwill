@@ -60,12 +60,16 @@ def register(name):
 
 @app.route("/player/remove/<name>")
 def remove(name):
-    try:
-        index = playerlist.index(name)
-        playerlist.pop(index)
-        return f"<h1>Removed {name}</h1>"
-    except:
-        return "<h1>Player not found</h1>"
+    # Trim whitespace from the input name
+    name = name.strip()
+    
+    # Find and remove the player by name from the playerlist
+    for i, player in enumerate(playerlist):
+        player_name = player['name'].strip()
+        if player_name == name:
+            playerlist.pop(i)
+            return f"<h1>Removed {name}</h1>"
+    return "<h1>Player not found</h1>"
 
 @app.route("/will/list")
 def list():
