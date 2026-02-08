@@ -98,6 +98,31 @@ def pretty_list():
                 pass
         raise ValueError(f"Time data '{time_str}' does not match any known format")
     
+    # Compute time_clicked (seconds between registration and time_sent) per entry
+    # and find each name's personal fastest (min time_clicked)
+    time_clicked_seconds_list = []
+    for player in playerlist:
+        utc_time = parse_time(player['time']).replace(tzinfo=pytz.UTC)
+        time_sent_str = player['time_sent']
+        try:
+            time_sent_utc = parse_time(time_sent_str).replace(tzinfo=pytz.UTC)
+            delta = (utc_time - time_sent_utc).total_seconds()
+            # Treat epoch (0) or negative or unreasonably large as N/A
+            if delta < 0 or delta > 86400 * 365:
+                time_clicked_seconds_list.append(None)
+            else:
+                time_clicked_seconds_list.append(delta)
+        except (ValueError, TypeError):
+            time_clicked_seconds_list.append(None)
+    
+    # Per-name fastest time_clicked (only among valid times)
+    fastest_per_name = {}
+    for player, secs in zip(playerlist, time_clicked_seconds_list):
+        name = player['name'].strip()
+        if secs is not None:
+            if name not in fastest_per_name or secs < fastest_per_name[name]:
+                fastest_per_name[name] = secs
+    
     formatted_list = ""
     for index, player in enumerate(playerlist, 1):
         utc_time = parse_time(player['time'])
@@ -106,19 +131,37 @@ def pretty_list():
         
         time_sent = player['time_sent']
         if time_sent != "N/A":
-            time_sent = parse_time(time_sent)
-            time_sent = time_sent.replace(tzinfo=pytz.UTC)
-            time_sent = time_sent.astimezone(eastern_tz)
-            time_sent_str = time_sent.strftime('%Y-%m-%d %I:%M:%S %p %Z')
+            try:
+                time_sent_parsed = parse_time(time_sent)
+                time_sent_parsed = time_sent_parsed.replace(tzinfo=pytz.UTC)
+                time_sent_eastern = time_sent_parsed.astimezone(eastern_tz)
+                time_sent_str = time_sent_eastern.strftime('%Y-%m-%d %I:%M:%S %p %Z')
+            except (ValueError, TypeError):
+                time_sent_str = "N/A"
         else:
             time_sent_str = "N/A"
         
+        time_clicked_secs = time_clicked_seconds_list[index - 1]
+        if time_clicked_secs is not None:
+            time_clicked_str = f"{time_clicked_secs:.2f} seconds"
+        else:
+            time_clicked_str = "N/A"
+        
+        name_key = player['name'].strip()
+        is_personal_fastest = (
+            time_clicked_secs is not None
+            and name_key in fastest_per_name
+            and abs(time_clicked_secs - fastest_per_name[name_key]) < 0.001
+        )
+        fastest_badge = ' <span style="background:#2ecc71;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em;">Personal fastest</span>' if is_personal_fastest else ''
+        
         formatted_list += f"""
-        <h2>Player {index}:</h2>
+        <h2>Player {index}:{fastest_badge}</h2>
         <ul>
             <li><strong>Name:</strong> {player['name']}</li>
             <li><strong>Registration Time (ET):</strong> {eastern_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')}</li>
             <li><strong>Time Sent (ET):</strong> {time_sent_str}</li>
+            <li><strong>Time Clicked:</strong> {time_clicked_str}</li>
             <li><strong>User Agent:</strong> {player['useragent']}</li>
         </ul>
         <hr>
