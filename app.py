@@ -1,10 +1,35 @@
 from flask import Flask
 from flask import request
 import datetime
+import json
+import os
 
 app = Flask(__name__)
 
+DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "playerlist.json")
 playerlist = []
+
+
+def load_playerlist():
+    """Load playerlist from disk. Call at startup."""
+    global playerlist
+    if os.path.isfile(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r") as f:
+                playerlist = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            playerlist = []
+    else:
+        playerlist = []
+
+
+def save_playerlist():
+    """Write playerlist to disk. Call after any change."""
+    try:
+        with open(DATA_FILE, "w") as f:
+            json.dump(playerlist, f, indent=2)
+    except OSError:
+        pass  # log in production if desired
 
 
 def format_duration(seconds):
@@ -54,6 +79,7 @@ def register(name):
         "time_sent": str(time_sent),
         "useragent": request.headers.get('User-Agent')
     })
+    save_playerlist()
     
     return f"""
     <html>
@@ -96,6 +122,7 @@ def remove(name):
         player_name = player['name'].strip()
         if player_name == name:
             playerlist.pop(i)
+            save_playerlist()
             return f"<h1>Removed {name}</h1>"
     return "<h1>Player not found</h1>"
 
@@ -237,7 +264,11 @@ def pretty_list():
 @app.route("/will/resetv2", methods = ['POST'])
 def reset():
     playerlist.clear()
+    save_playerlist()
     return "wiped list"
+
+
+load_playerlist()
 
 if __name__ == "__main__":
     app.run()
