@@ -46,7 +46,7 @@ def register(name):
             </style>
         
         <body>      
-            <h1>It worked. You are now registered as {name}.</h1>
+            <h1>Congrats!You are now registered as {name}.</h1>
             <h1>The next step is to pay to lock in your spot.</h1>
             <h1>CLICK ONE</h1>
             <a href=\"https:\/\/venmo.com\/u\/will_luttrell\" target="_blank"><h1>Venmo</h1></a>
