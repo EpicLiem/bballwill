@@ -6,6 +6,29 @@ app = Flask(__name__)
 
 playerlist = []
 
+
+def format_duration(seconds):
+    """Format seconds as 'X days Y hours Z minutes W seconds', omitting zero parts."""
+    secs = int(seconds)
+    if secs < 0:
+        return "0 seconds"
+    days = secs // 86400
+    secs %= 86400
+    hours = secs // 3600
+    secs %= 3600
+    minutes = secs // 60
+    secs %= 60
+    parts = []
+    if days > 0:
+        parts.append(f"{days} day{'s' if days != 1 else ''}")
+    if hours > 0:
+        parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
+    if minutes > 0:
+        parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+    if secs > 0 or not parts:
+        parts.append(f"{secs} second{'s' if secs != 1 else ''}")
+    return " ".join(parts)
+
 @app.route("/player/register/<name>")
 def register(name):
     # Get the UNIX timestamp from query parameters, or default to epoch time (0)
@@ -19,6 +42,11 @@ def register(name):
 
     # Use current UTC time for the actual registration time
     ts = datetime.datetime.utcnow()
+    click_time_seconds = (ts - time_sent).total_seconds()
+    if click_time_seconds < 0 or click_time_seconds > 86400 * 365:
+        congrats_line = f"Congrats! You are now registered as {name}."
+    else:
+        congrats_line = f"Congrats! Your click time was {format_duration(click_time_seconds)}. You are now registered as {name}."
 
     playerlist.append({
         "name": name,
@@ -46,7 +74,7 @@ def register(name):
             </style>
         
         <body>      
-            <h1>Congrats!You are now registered as {name}.</h1>
+            <h1>{congrats_line}</h1>
             <h1>The next step is to pay to lock in your spot.</h1>
             <h1>CLICK ONE</h1>
             <a href=\"https:\/\/venmo.com\/u\/will_luttrell\" target="_blank"><h1>Venmo</h1></a>
@@ -143,7 +171,7 @@ def pretty_list():
         
         time_clicked_secs = time_clicked_seconds_list[index - 1]
         if time_clicked_secs is not None:
-            time_clicked_str = f"{time_clicked_secs:.2f} seconds"
+            time_clicked_str = format_duration(time_clicked_secs)
         else:
             time_clicked_str = "N/A"
         
