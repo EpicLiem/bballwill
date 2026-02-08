@@ -3,6 +3,7 @@ from flask import request
 import datetime
 import json
 import os
+import re
 
 app = Flask(__name__)
 
@@ -53,6 +54,27 @@ def format_duration(seconds):
     if secs > 0 or not parts:
         parts.append(f"{secs} second{'s' if secs != 1 else ''}")
     return " ".join(parts)
+
+
+BOT_PATTERNS = [
+    r"Googlebot",
+    r"snippet",
+    r"facebookexternalhit",
+    r"GoogleMessages",
+    r"Mozilla/5.0 \(X11; Ubuntu; Linux i686; rv:24.0\) Gecko/20100101 Firefox/24.0",
+]
+
+
+def is_bot(user_agent):
+    """True if user_agent matches any known bot pattern."""
+    if not user_agent:
+        return False
+    ua = str(user_agent)
+    for pattern in BOT_PATTERNS:
+        if re.search(pattern, ua, re.IGNORECASE):
+            return True
+    return False
+
 
 @app.route("/player/register/<name>")
 def register(name):
@@ -170,9 +192,11 @@ def pretty_list():
         except (ValueError, TypeError):
             time_clicked_seconds_list.append(None)
     
-    # Per-name fastest time_clicked (only among valid times)
+    # Per-name fastest time_clicked (only among valid times; exclude bots)
     fastest_per_name = {}
     for player, secs in zip(playerlist, time_clicked_seconds_list):
+        if is_bot(player.get('useragent') or ''):
+            continue
         name = player['name'].strip()
         if secs is not None:
             if name not in fastest_per_name or secs < fastest_per_name[name]:
@@ -203,21 +227,25 @@ def pretty_list():
             time_clicked_str = "N/A"
         
         name_key = player['name'].strip()
+        user_agent = player.get('useragent') or ''
+        is_bot_entry = is_bot(user_agent)
         is_personal_fastest = (
-            time_clicked_secs is not None
+            not is_bot_entry
+            and time_clicked_secs is not None
             and name_key in fastest_per_name
             and abs(time_clicked_secs - fastest_per_name[name_key]) < 0.001
         )
         fastest_badge = ' <span style="background:#2ecc71;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em;">Personal fastest</span>' if is_personal_fastest else ''
+        bot_badge = ' <span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em;">Bot</span>' if is_bot_entry else ''
         
         formatted_list += f"""
-        <h2>Player {index}:{fastest_badge}</h2>
+        <h2>Player {index}:{fastest_badge}{bot_badge}</h2>
         <ul>
             <li><strong>Name:</strong> {player['name']}</li>
             <li><strong>Registration Time (ET):</strong> {eastern_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')}</li>
             <li><strong>Time Sent (ET):</strong> {time_sent_str}</li>
             <li><strong>Time Clicked:</strong> {time_clicked_str}</li>
-            <li><strong>User Agent:</strong> {player['useragent']}</li>
+            <li><strong>User Agent:</strong> {player.get('useragent', '')}</li>
         </ul>
         <hr>
         """
