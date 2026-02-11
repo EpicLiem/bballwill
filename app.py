@@ -184,15 +184,12 @@ def pretty_list():
         try:
             time_sent_utc = parse_time(time_sent_str).replace(tzinfo=pytz.UTC)
             delta = (utc_time - time_sent_utc).total_seconds()
-            # Treat epoch (0) or negative or unreasonably large as N/A
-            if delta < 0 or delta > 86400 * 365:
-                time_clicked_seconds_list.append(None)
-            else:
-                time_clicked_seconds_list.append(delta)
+            # Store raw delta (including negative) so we can always show a duration
+            time_clicked_seconds_list.append(delta)
         except (ValueError, TypeError):
             time_clicked_seconds_list.append(None)
     
-    # Per-name fastest time_clicked (only among valid times; exclude bots)
+    # Per-name fastest time_clicked (lowest time wins; more negative = faster; exclude bots)
     fastest_per_name = {}
     for player, secs in zip(playerlist, time_clicked_seconds_list):
         if is_bot(player.get('useragent') or ''):
@@ -222,7 +219,12 @@ def pretty_list():
         
         time_clicked_secs = time_clicked_seconds_list[index - 1]
         if time_clicked_secs is not None:
-            time_clicked_str = format_duration(time_clicked_secs)
+            if time_clicked_secs < 0:
+                time_clicked_str = "-" + format_duration(abs(time_clicked_secs))
+            elif time_clicked_secs <= 86400 * 365:
+                time_clicked_str = format_duration(time_clicked_secs)
+            else:
+                time_clicked_str = "N/A (over 1 year)"
         else:
             time_clicked_str = "N/A"
         
