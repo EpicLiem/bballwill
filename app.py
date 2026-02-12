@@ -1,5 +1,4 @@
-from flask import Flask
-from flask import request
+from flask import Flask, request, redirect
 import datetime
 import json
 import os
@@ -162,10 +161,10 @@ def remove_by_click(click_number):
         </html>
         """
     
-    # POST - actually remove
+    # POST - actually remove, then redirect to prevent re-POST on refresh
     removed = playerlist.pop(click_number - 1)
     save_playerlist()
-    return f"<h1>Removed Click {click_number}: {removed['name']}</h1>"
+    return redirect(f"/will/pretty?removed={removed['name']}")
 
 @app.route("/will/list")
 def show_list():
@@ -318,6 +317,7 @@ def pretty_list():
             </style>
         </head>
         <body>
+            {"<h2 style='color:#e74c3c;text-align:center;'>Removed: " + request.args.get('removed') + "</h2>" if request.args.get('removed') else ""}
             <h1>Registered Players</h1>
             <h2 class="count">{unique_player_count} unique player{"s" if unique_player_count != 1 else ""}</h2>
             {formatted_list}
