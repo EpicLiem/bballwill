@@ -137,19 +137,14 @@ def register(name):
     """
 
 
-@app.route("/player/remove/<name>")
-def remove(name):
-    # Trim whitespace from the input name
-    name = name.strip()
+@app.route("/will/remove/<int:click_number>")
+def remove_by_click(click_number):
+    if click_number < 1 or click_number > len(playerlist):
+        return f"<h1>Invalid click number. Must be 1-{len(playerlist)}</h1>"
     
-    # Find and remove the player by name from the playerlist
-    for i, player in enumerate(playerlist):
-        player_name = player['name'].strip()
-        if player_name == name:
-            playerlist.pop(i)
-            save_playerlist()
-            return f"<h1>Removed {name}</h1>"
-    return "<h1>Player not found</h1>"
+    removed = playerlist.pop(click_number - 1)
+    save_playerlist()
+    return f"<h1>Removed Click {click_number}: {removed['name']}</h1>"
 
 @app.route("/will/list")
 def show_list():
