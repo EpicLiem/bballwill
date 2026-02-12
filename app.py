@@ -90,12 +90,13 @@ def register(name):
     # Use current UTC time for the actual registration time
     ts = datetime.datetime.utcnow()
     click_time_seconds = (ts - time_sent).total_seconds()
+    registered_line = f"You are now registered as {name}."
     if click_time_seconds < 0:
-        congrats_line = f"You are an Earlybird! Your spot is guaranteed. You are now registered as {name}."
+        congrats_line = f"You are an Earlybird! Your spot is guaranteed."
     elif click_time_seconds > 86400 * 365:
-        congrats_line = f"You are now registered as {name}."
+        congrats_line = ""
     else:
-        congrats_line = f"Your click time was {format_duration(click_time_seconds)}. You are now registered as {name}."
+        congrats_line = f"Your click time was {format_duration(click_time_seconds)}."
 
     playerlist.append({
         "name": name,
@@ -125,6 +126,7 @@ def register(name):
         
         <body>      
             <h1>{congrats_line}</h1>
+            <h1>{registered_line}</h1>
             <h1>The next step is to pay to lock in your spot.</h1>
             <h1>CLICK ONE</h1>
             <a href=\"https:\/\/venmo.com\/u\/will_luttrell\" target="_blank"><h1>Venmo</h1></a>
