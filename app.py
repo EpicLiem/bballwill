@@ -243,16 +243,18 @@ def pretty_list():
         bot_badge = ' <span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.85em;">Bot</span>' if is_bot_entry else ''
         
         formatted_list += f"""
-        <h2>Player {index}:{fastest_badge}{bot_badge}</h2>
-        <ul>
-            <li><strong>Name:</strong> {player['name']}</li>
-            <li><strong>Registration Time (ET):</strong> {eastern_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')}</li>
-            <li><strong>Time Sent (ET):</strong> {time_sent_str}</li>
-            <li><strong>Time Clicked:</strong> {time_clicked_str}</li>
-            <li><strong>User Agent:</strong> {player.get('useragent', '')}</li>
-        </ul>
+        <h2>Click {index}:{fastest_badge}{bot_badge}</h2>
+        <table>
+            <tr><td class="key">Name</td><td>{player['name']}</td></tr>
+            <tr><td class="key">Registration Time (ET)</td><td>{eastern_time.strftime('%Y-%m-%d %I:%M:%S %p %Z')}</td></tr>
+            <tr><td class="key">Time Sent (ET)</td><td>{time_sent_str}</td></tr>
+            <tr><td class="key">Time Clicked</td><td>{time_clicked_str}</td></tr>
+            <tr><td class="key">User Agent</td><td>{player.get('useragent', '')}</td></tr>
+        </table>
         <hr>
         """
+    
+    unique_player_count = len(fastest_per_name)
     
     return f"""
     <html>
@@ -269,12 +271,25 @@ def pretty_list():
                     color: #333;
                     text-align: center;
                 }}
-                ul {{
-                    list-style-type: none;
-                    padding-left: 0;
+                h2.count {{
+                    color: #2ecc71;
+                    text-align: center;
+                    font-size: 1.5em;
                 }}
-                li {{
-                    margin-bottom: 5px;
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 10px;
+                }}
+                td {{
+                    padding: 6px 10px;
+                    border-bottom: 1px solid #eee;
+                    vertical-align: top;
+                }}
+                td.key {{
+                    font-weight: bold;
+                    width: 180px;
+                    color: #555;
                 }}
                 hr {{
                     border: 0;
@@ -285,6 +300,7 @@ def pretty_list():
         </head>
         <body>
             <h1>Registered Players</h1>
+            <h2 class="count">{unique_player_count} unique player{"s" if unique_player_count != 1 else ""}</h2>
             {formatted_list}
             <form action="/will/resetv2" method="post">
                 <input type="submit" name="reset" value="Reset List" />
