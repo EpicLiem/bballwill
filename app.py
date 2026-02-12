@@ -151,7 +151,7 @@ def remove(name):
     return "<h1>Player not found</h1>"
 
 @app.route("/will/list")
-def list():
+def show_list():
     return f"""{str(playerlist)}
     <form action="/will/resetv2" method="post">
         <input type="submit" name="reset" value="reset" />
