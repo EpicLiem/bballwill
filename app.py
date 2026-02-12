@@ -110,31 +110,88 @@ def register(name):
     <html>
         <head>
             <title>Registration</title>
-            <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Courier+Prime">
-
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             <style>
-            body {{
+                body {{
                     background-color: #1e1e1e;
-                }}
-                h1 {{
-                    color: white;
-                    font-family: 'Courier Prime', monospace;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    margin: 0;
+                    padding: 20px;
                     text-align: center;
                 }}
+                .checkmark {{
+                    font-size: 80px;
+                    margin-bottom: 10px;
+                }}
+                .click-time {{
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    font-size: 32px;
+                    font-weight: bold;
+                    padding: 20px 40px;
+                    border-radius: 15px;
+                    display: inline-block;
+                    margin: 20px 0;
+                }}
+                .registered {{
+                    color: #2ecc71;
+                    font-size: 24px;
+                    margin: 15px 0;
+                }}
+                .step {{
+                    color: #888;
+                    font-size: 18px;
+                    margin: 30px 0 10px 0;
+                }}
+                .step-done {{
+                    color: #2ecc71;
+                }}
+                .pay-prompt {{
+                    color: white;
+                    font-size: 22px;
+                    margin: 10px 0 25px 0;
+                }}
+                .buttons {{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                    max-width: 300px;
+                    margin: 0 auto;
+                }}
+                .pay-btn {{
+                    display: block;
+                    padding: 18px 30px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 12px;
+                }}
+                .venmo {{ background: #008CFF; }}
+                .cashapp {{ background: #00D632; }}
+                .paypal {{ background: #003087; }}
+                .applepay {{ background: #333; }}
             </style>
-        
-        <body>      
-            <h1>{congrats_line}</h1>
-            <h1>{registered_line}</h1>
-            <h1>The next step is to pay to lock in your spot.</h1>
-            <h1>CLICK ONE</h1>
-            <a href=\"https:\/\/venmo.com\/u\/will_luttrell\" target="_blank"><h1>Venmo</h1></a>
-            <a href=\"https:\/\/cash.app/$luttrellwill\"" target="_blank"><h1>Cash App</h1></a>
-            <a href=\"https:\/\/www.paypal.com/paypalme/paywillnowplease\"" target="_blank"><h1>Paypal</h1></a>
-            <a href=\"sms:+12014460400"" target="_blank"><h1>Apple Pay</h1></a>
+        </head>
         <body>
-    <html>
+            <div class="checkmark">✓</div>
+            
+            {"<div class='click-time'>" + congrats_line + "</div>" if congrats_line else ""}
+            
+            <div class="registered">{registered_line}</div>
+            
+            <div class="step"><span class="step-done">Step 1: Registered ✓</span></div>
+            <div class="step">Step 2: Pay $13.50</div>
+            <div class="pay-prompt">Pay now to save your spot</div>
+            
+            <div class="buttons">
+                <a href="https://venmo.com/u/will_luttrell" target="_blank" class="pay-btn venmo">Venmo</a>
+                <a href="https://cash.app/$luttrellwill" target="_blank" class="pay-btn cashapp">Cash App</a>
+                <a href="https://www.paypal.com/paypalme/paywillnowplease" target="_blank" class="pay-btn paypal">PayPal</a>
+                <a href="sms:+12014460400" target="_blank" class="pay-btn applepay">Apple Pay</a>
+            </div>
+        </body>
+    </html>
     """
 
 
