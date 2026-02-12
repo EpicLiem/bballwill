@@ -201,8 +201,12 @@ def pretty_list():
             if name not in fastest_per_name or secs < fastest_per_name[name]:
                 fastest_per_name[name] = secs
     
+    # Combine playerlist with time_clicked_seconds and original index, then reverse for newest first
+    combined = list(zip(playerlist, time_clicked_seconds_list, range(1, len(playerlist) + 1)))
+    combined.reverse()
+    
     formatted_list = ""
-    for index, player in enumerate(playerlist, 1):
+    for player, time_clicked_secs, index in combined:
         utc_time = parse_time(player['time'])
         utc_time = utc_time.replace(tzinfo=pytz.UTC)
         eastern_time = utc_time.astimezone(eastern_tz)
@@ -218,8 +222,6 @@ def pretty_list():
                 time_sent_str = "N/A"
         else:
             time_sent_str = "N/A"
-        
-        time_clicked_secs = time_clicked_seconds_list[index - 1]
         if time_clicked_secs is not None:
             if time_clicked_secs < 0:
                 time_clicked_str = "-" + format_duration(abs(time_clicked_secs))
