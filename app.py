@@ -119,10 +119,6 @@ def register(name):
                     padding: 20px;
                     text-align: center;
                 }}
-                .checkmark {{
-                    font-size: 80px;
-                    margin-bottom: 10px;
-                }}
                 .click-time {{
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
@@ -174,8 +170,6 @@ def register(name):
             </style>
         </head>
         <body>
-            <div class="checkmark">✓</div>
-            
             {"<div class='click-time'>" + congrats_line + "</div>" if congrats_line else ""}
             
             <div class="registered">{registered_line}</div>
