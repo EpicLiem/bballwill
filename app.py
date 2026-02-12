@@ -90,10 +90,12 @@ def register(name):
     # Use current UTC time for the actual registration time
     ts = datetime.datetime.utcnow()
     click_time_seconds = (ts - time_sent).total_seconds()
-    if click_time_seconds < 0 or click_time_seconds > 86400 * 365:
-        congrats_line = f"Congrats! You are now registered as {name}."
+    if click_time_seconds < 0:
+        congrats_line = f"You are an Earlybird! Your spot is guaranteed. You are now registered as {name}."
+    elif click_time_seconds > 86400 * 365:
+        congrats_line = f"You are now registered as {name}."
     else:
-        congrats_line = f"Congrats! Your click time was {format_duration(click_time_seconds)}. You are now registered as {name}."
+        congrats_line = f"Your click time was {format_duration(click_time_seconds)}. You are now registered as {name}."
 
     playerlist.append({
         "name": name,
