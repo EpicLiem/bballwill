@@ -62,6 +62,7 @@ BOT_PATTERNS = [
     r"facebookexternalhit",
     r"GoogleMessages",
     r"Mozilla/5.0 \(X11; Ubuntu; Linux i686; rv:24.0\) Gecko/20100101 Firefox/24.0",
+    r"github\.com",
 ]
 
 
