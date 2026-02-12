@@ -137,11 +137,32 @@ def register(name):
     """
 
 
-@app.route("/will/remove/<int:click_number>")
+@app.route("/will/remove/<int:click_number>", methods=['GET', 'POST'])
 def remove_by_click(click_number):
     if click_number < 1 or click_number > len(playerlist):
         return f"<h1>Invalid click number. Must be 1-{len(playerlist)}</h1>"
     
+    player = playerlist[click_number - 1]
+    
+    if request.method == 'GET':
+        # Show confirmation form
+        return f"""
+        <html>
+            <head><title>Confirm Removal</title></head>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center;">
+                <h1>Remove Click {click_number}?</h1>
+                <h2>{player['name']}</h2>
+                <form method="POST">
+                    <button type="submit" style="background: #e74c3c; color: white; padding: 15px 30px; font-size: 18px; border: none; cursor: pointer; margin: 10px;">
+                        Yes, Remove
+                    </button>
+                </form>
+                <a href="/will/pretty" style="display: inline-block; padding: 15px 30px; font-size: 18px; margin: 10px;">Cancel</a>
+            </body>
+        </html>
+        """
+    
+    # POST - actually remove
     removed = playerlist.pop(click_number - 1)
     save_playerlist()
     return f"<h1>Removed Click {click_number}: {removed['name']}</h1>"
