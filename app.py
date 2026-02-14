@@ -270,6 +270,18 @@ def pretty_list():
             if name not in fastest_per_name or secs < fastest_per_name[name]:
                 fastest_per_name[name] = secs
     
+    # Build sorted leaderboard table (fastest to slowest)
+    sorted_players = sorted(fastest_per_name.items(), key=lambda x: x[1])
+    leaderboard_rows = ""
+    for rank, (name, secs) in enumerate(sorted_players, 1):
+        if secs < 0:
+            time_str = "-" + format_duration(abs(secs))
+        elif secs <= 86400 * 365:
+            time_str = format_duration(secs)
+        else:
+            time_str = "N/A"
+        leaderboard_rows += f"<tr><td>{rank}</td><td>{name}</td><td>{time_str}</td></tr>\n"
+    
     # Combine playerlist with time_clicked_seconds and original index, then reverse for newest first
     combined = list(zip(playerlist, time_clicked_seconds_list, range(1, len(playerlist) + 1)))
     combined.reverse()
@@ -362,6 +374,34 @@ def pretty_list():
                     width: 180px;
                     color: #555;
                 }}
+                .leaderboard {{
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-bottom: 30px;
+                }}
+                .leaderboard h2 {{
+                    margin-top: 0;
+                    color: #333;
+                }}
+                .leaderboard table {{
+                    width: 100%;
+                }}
+                .leaderboard th {{
+                    text-align: left;
+                    padding: 8px 10px;
+                    border-bottom: 2px solid #ddd;
+                    color: #555;
+                }}
+                .leaderboard td {{
+                    padding: 8px 10px;
+                    border-bottom: 1px solid #eee;
+                }}
+                .activity-log {{
+                    margin-top: 30px;
+                    border-top: 2px solid #333;
+                    padding-top: 20px;
+                }}
                 hr {{
                     border: 0;
                     border-top: 1px solid #ddd;
@@ -373,7 +413,23 @@ def pretty_list():
             {"<h2 style='color:#e74c3c;text-align:center;'>Removed: " + request.args.get('removed') + "</h2>" if request.args.get('removed') else ""}
             <h1>Registered Players</h1>
             <h2 class="count">{unique_player_count} unique player{"s" if unique_player_count != 1 else ""}</h2>
-            {formatted_list}
+            
+            <div class="leaderboard">
+                <h2>Leaderboard (Fastest Click Times)</h2>
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Name</th><th>Click Time</th></tr>
+                    </thead>
+                    <tbody>
+                        {leaderboard_rows}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="activity-log">
+                <h2>Activity Log</h2>
+                {formatted_list}
+            </div>
             <form action="/will/resetv2" method="post">
                 <input type="submit" name="reset" value="Reset List" />
             </form>
