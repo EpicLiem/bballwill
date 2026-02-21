@@ -98,6 +98,31 @@ def register(name):
     else:
         congrats_line = f"Your click time was {format_duration(click_time_seconds)}."
 
+    # Count unique non-bot players who have already clicked (before this click)
+    unique_clickers = set()
+    for p in playerlist:
+        if not is_bot(p.get('useragent') or ''):
+            unique_clickers.add(p['name'].strip())
+    player_count = len(unique_clickers)
+
+    # Find this player's personal fastest click time from previous registrations
+    personal_fastest = None
+    clean_name = name.strip()
+    for p in playerlist:
+        if p['name'].strip() == clean_name and not is_bot(p.get('useragent') or ''):
+            try:
+                p_time = datetime.datetime.strptime(p['time'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+                p_sent = datetime.datetime.strptime(p['time_sent'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+                p_secs = (p_time - p_sent).total_seconds()
+                if p_secs >= 0 and (personal_fastest is None or p_secs < personal_fastest):
+                    personal_fastest = p_secs
+            except (ValueError, TypeError):
+                pass
+
+    # Include current click in personal fastest comparison
+    if click_time_seconds >= 0 and (personal_fastest is None or click_time_seconds < personal_fastest):
+        personal_fastest = click_time_seconds
+
     playerlist.append({
         "name": name,
         "time": str(ts),
@@ -105,7 +130,17 @@ def register(name):
         "useragent": request.headers.get('User-Agent')
     })
     save_playerlist()
-    
+
+    # Build the extra info lines
+    # Player count: include this player in the count
+    if clean_name not in unique_clickers:
+        player_count += 1
+    count_line = f"You are player #{player_count}."
+
+    fastest_line = ""
+    if personal_fastest is not None and click_time_seconds >= 0 and click_time_seconds <= 86400 * 365:
+        fastest_line = f"Your personal fastest: {format_duration(personal_fastest)}."
+
     return f"""
     <html>
         <head>
@@ -128,6 +163,17 @@ def register(name):
                     border-radius: 15px;
                     display: inline-block;
                     margin: 20px 0;
+                }}
+                .info {{
+                    color: #bbb;
+                    font-size: 18px;
+                    margin: 8px 0;
+                }}
+                .fastest {{
+                    color: #f39c12;
+                    font-size: 20px;
+                    font-weight: bold;
+                    margin: 8px 0;
                 }}
                 .registered {{
                     color: #2ecc71;
@@ -171,13 +217,15 @@ def register(name):
         </head>
         <body>
             {"<div class='click-time'>" + congrats_line + "</div>" if congrats_line else ""}
-            
+            {"<div class='fastest'>" + fastest_line + "</div>" if fastest_line else ""}
+            <div class="info">{count_line}</div>
+
             <div class="registered">{registered_line}</div>
-            
+
             <div class="step"><span class="step-done">Step 1: Registered ✓</span></div>
             <div class="step">Step 2: Pay $13.50</div>
             <div class="pay-prompt">Pay now to save your spot</div>
-            
+
             <div class="buttons">
                 <a href="https://venmo.com/u/will_luttrell" target="_blank" class="pay-btn venmo">Venmo</a>
                 <a href="https://cash.app/$luttrellwill" target="_blank" class="pay-btn cashapp">Cash App</a>
