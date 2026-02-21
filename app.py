@@ -98,30 +98,41 @@ def register(name):
     else:
         congrats_line = f"Your click time was {format_duration(click_time_seconds)}."
 
-    # Count unique non-bot players who have already clicked (before this click)
-    unique_clickers = set()
-    for p in playerlist:
-        if not is_bot(p.get('useragent') or ''):
-            unique_clickers.add(p['name'].strip())
-    player_count = len(unique_clickers)
+    # Earlybirds (negative click time) just get registered — no extra stats
+    count_line = ""
+    fastest_line = ""
 
-    # Find this player's personal fastest click time from previous registrations
-    personal_fastest = None
-    clean_name = name.strip()
-    for p in playerlist:
-        if p['name'].strip() == clean_name and not is_bot(p.get('useragent') or ''):
-            try:
-                p_time = datetime.datetime.strptime(p['time'].split('.')[0], '%Y-%m-%d %H:%M:%S')
-                p_sent = datetime.datetime.strptime(p['time_sent'].split('.')[0], '%Y-%m-%d %H:%M:%S')
-                p_secs = (p_time - p_sent).total_seconds()
-                if p_secs >= 0 and (personal_fastest is None or p_secs < personal_fastest):
-                    personal_fastest = p_secs
-            except (ValueError, TypeError):
-                pass
+    if click_time_seconds >= 0:
+        # Count unique non-bot players who have already clicked (before this click)
+        unique_clickers = set()
+        for p in playerlist:
+            if not is_bot(p.get('useragent') or ''):
+                unique_clickers.add(p['name'].strip())
 
-    # Include current click in personal fastest comparison
-    if click_time_seconds >= 0 and (personal_fastest is None or click_time_seconds < personal_fastest):
-        personal_fastest = click_time_seconds
+        clean_name = name.strip()
+        if clean_name not in unique_clickers:
+            unique_clickers.add(clean_name)
+        count_line = f"You are player #{len(unique_clickers)}."
+
+        # Find this player's personal fastest click time from previous registrations
+        personal_fastest = None
+        for p in playerlist:
+            if p['name'].strip() == clean_name and not is_bot(p.get('useragent') or ''):
+                try:
+                    p_time = datetime.datetime.strptime(p['time'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    p_sent = datetime.datetime.strptime(p['time_sent'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+                    p_secs = (p_time - p_sent).total_seconds()
+                    if p_secs >= 0 and (personal_fastest is None or p_secs < personal_fastest):
+                        personal_fastest = p_secs
+                except (ValueError, TypeError):
+                    pass
+
+        # Include current click in personal fastest comparison
+        if personal_fastest is None or click_time_seconds < personal_fastest:
+            personal_fastest = click_time_seconds
+
+        if click_time_seconds <= 86400 * 365:
+            fastest_line = f"Your personal fastest: {format_duration(personal_fastest)}."
 
     playerlist.append({
         "name": name,
@@ -130,16 +141,6 @@ def register(name):
         "useragent": request.headers.get('User-Agent')
     })
     save_playerlist()
-
-    # Build the extra info lines
-    # Player count: include this player in the count
-    if clean_name not in unique_clickers:
-        player_count += 1
-    count_line = f"You are player #{player_count}."
-
-    fastest_line = ""
-    if personal_fastest is not None and click_time_seconds >= 0 and click_time_seconds <= 86400 * 365:
-        fastest_line = f"Your personal fastest: {format_duration(personal_fastest)}."
 
     return f"""
     <html>
