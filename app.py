@@ -151,8 +151,8 @@ def register(name):
                     padding: 20px;
                     text-align: center;
                 }}
-                .click-time {{
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                .fastest {{
+                    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
                     color: white;
                     font-size: 32px;
                     font-weight: bold;
@@ -161,15 +161,14 @@ def register(name):
                     display: inline-block;
                     margin: 20px 0;
                 }}
+                .click-time {{
+                    color: #bbb;
+                    font-size: 20px;
+                    margin: 8px 0;
+                }}
                 .info {{
                     color: #bbb;
                     font-size: 18px;
-                    margin: 8px 0;
-                }}
-                .fastest {{
-                    color: #f39c12;
-                    font-size: 20px;
-                    font-weight: bold;
                     margin: 8px 0;
                 }}
                 .registered {{
@@ -213,8 +212,8 @@ def register(name):
             </style>
         </head>
         <body>
-            {"<div class='click-time'>" + congrats_line + "</div>" if congrats_line else ""}
             {"<div class='fastest'>" + fastest_line + "</div>" if fastest_line else ""}
+            {"<div class='click-time'>" + congrats_line + "</div>" if congrats_line else ""}
             <div class="info">{count_line}</div>
 
             <div class="registered">{registered_line}</div>
