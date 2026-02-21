@@ -96,7 +96,7 @@ def register(name):
     elif click_time_seconds > 86400 * 365:
         congrats_line = ""
     else:
-        congrats_line = f"Your click time was {format_duration(click_time_seconds)}."
+        congrats_line = f"This click time was {format_duration(click_time_seconds)}."
 
     # Count unique non-bot players (always shown, including earlybirds)
     unique_clickers = set()
@@ -128,7 +128,7 @@ def register(name):
             personal_fastest = click_time_seconds
 
         if click_time_seconds <= 86400 * 365:
-            fastest_line = f"Your personal fastest: {format_duration(personal_fastest)}."
+            fastest_line = f"Your fastest click time was {format_duration(personal_fastest)}."
 
     playerlist.append({
         "name": name,
