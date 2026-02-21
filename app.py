@@ -91,44 +91,62 @@ def register(name):
     ts = datetime.datetime.utcnow()
     click_time_seconds = (ts - time_sent).total_seconds()
     registered_line = f"You are now registered as {name}."
-    if click_time_seconds < 0:
-        congrats_line = f"You are an Earlybird! Your spot is guaranteed."
-    elif click_time_seconds > 86400 * 365:
-        congrats_line = ""
-    else:
-        congrats_line = f"This click time was {format_duration(click_time_seconds)}."
+    clean_name = name.strip()
 
     # Count unique non-bot players (always shown, including earlybirds)
     unique_clickers = set()
     for p in playerlist:
         if not is_bot(p.get('useragent') or ''):
             unique_clickers.add(p['name'].strip())
-    clean_name = name.strip()
     if clean_name not in unique_clickers:
         unique_clickers.add(clean_name)
     count_line = f"{len(unique_clickers)} player{'s have' if len(unique_clickers) != 1 else ' has'} clicked."
 
-    # Personal fastest only for non-earlybird clicks
+    # Find this player's all-time best (lowest) click time, including negative (earlybird)
+    personal_best = None
+    for p in playerlist:
+        if p['name'].strip() == clean_name and not is_bot(p.get('useragent') or ''):
+            try:
+                p_time = datetime.datetime.strptime(p['time'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+                p_sent = datetime.datetime.strptime(p['time_sent'].split('.')[0], '%Y-%m-%d %H:%M:%S')
+                p_secs = (p_time - p_sent).total_seconds()
+                if personal_best is None or p_secs < personal_best:
+                    personal_best = p_secs
+            except (ValueError, TypeError):
+                pass
+    # Include current click
+    if personal_best is None or click_time_seconds < personal_best:
+        personal_best = click_time_seconds
+
+    # Player is an earlybird if their best-ever click time is negative
+    is_earlybird = personal_best is not None and personal_best < 0
+
+    congrats_line = ""
     fastest_line = ""
-    if click_time_seconds >= 0:
-        personal_fastest = None
+    if is_earlybird:
+        congrats_line = "You are an Earlybird! Your spot is guaranteed."
+        if click_time_seconds >= 0 and click_time_seconds <= 86400 * 365:
+            congrats_line += f" This click time was {format_duration(click_time_seconds)}."
+    elif click_time_seconds > 86400 * 365:
+        pass
+    else:
+        congrats_line = f"This click time was {format_duration(click_time_seconds)}."
+        # Only show fastest for non-earlybird, non-negative best times
+        personal_fastest_positive = None
         for p in playerlist:
             if p['name'].strip() == clean_name and not is_bot(p.get('useragent') or ''):
                 try:
                     p_time = datetime.datetime.strptime(p['time'].split('.')[0], '%Y-%m-%d %H:%M:%S')
                     p_sent = datetime.datetime.strptime(p['time_sent'].split('.')[0], '%Y-%m-%d %H:%M:%S')
                     p_secs = (p_time - p_sent).total_seconds()
-                    if p_secs >= 0 and (personal_fastest is None or p_secs < personal_fastest):
-                        personal_fastest = p_secs
+                    if p_secs >= 0 and (personal_fastest_positive is None or p_secs < personal_fastest_positive):
+                        personal_fastest_positive = p_secs
                 except (ValueError, TypeError):
                     pass
-
-        # Include current click in personal fastest comparison
-        if personal_fastest is None or click_time_seconds < personal_fastest:
-            personal_fastest = click_time_seconds
-
+        if personal_fastest_positive is None or click_time_seconds < personal_fastest_positive:
+            personal_fastest_positive = click_time_seconds
         if click_time_seconds <= 86400 * 365:
-            fastest_line = f"Your fastest click time was {format_duration(personal_fastest)}."
+            fastest_line = f"Your fastest click time was {format_duration(personal_fastest_positive)}."
 
     playerlist.append({
         "name": name,
