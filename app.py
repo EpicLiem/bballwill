@@ -98,23 +98,19 @@ def register(name):
     else:
         congrats_line = f"Your click time was {format_duration(click_time_seconds)}."
 
-    # Earlybirds (negative click time) just get registered — no extra stats
-    count_line = ""
+    # Count unique non-bot players (always shown, including earlybirds)
+    unique_clickers = set()
+    for p in playerlist:
+        if not is_bot(p.get('useragent') or ''):
+            unique_clickers.add(p['name'].strip())
+    clean_name = name.strip()
+    if clean_name not in unique_clickers:
+        unique_clickers.add(clean_name)
+    count_line = f"{len(unique_clickers)} player{'s have' if len(unique_clickers) != 1 else ' has'} clicked."
+
+    # Personal fastest only for non-earlybird clicks
     fastest_line = ""
-
     if click_time_seconds >= 0:
-        # Count unique non-bot players who have already clicked (before this click)
-        unique_clickers = set()
-        for p in playerlist:
-            if not is_bot(p.get('useragent') or ''):
-                unique_clickers.add(p['name'].strip())
-
-        clean_name = name.strip()
-        if clean_name not in unique_clickers:
-            unique_clickers.add(clean_name)
-        count_line = f"You are player #{len(unique_clickers)}."
-
-        # Find this player's personal fastest click time from previous registrations
         personal_fastest = None
         for p in playerlist:
             if p['name'].strip() == clean_name and not is_bot(p.get('useragent') or ''):
