@@ -124,9 +124,9 @@ def register(name):
     congrats_line = ""
     fastest_line = ""
     if is_earlybird:
-        congrats_line = "You are an Earlybird! Your spot is guaranteed."
+        fastest_line = "You are an Earlybird! Your spot is guaranteed."
         if click_time_seconds >= 0 and click_time_seconds <= 86400 * 365:
-            congrats_line += f" This click time was {format_duration(click_time_seconds)}."
+            congrats_line = f"This click time was {format_duration(click_time_seconds)}."
     elif click_time_seconds > 86400 * 365:
         pass
     else:
