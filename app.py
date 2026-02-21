@@ -212,11 +212,11 @@ def register(name):
             </style>
         </head>
         <body>
+            <div class="registered">{registered_line}</div>
+
             {"<div class='fastest'>" + fastest_line + "</div>" if fastest_line else ""}
             {"<div class='click-time'>" + congrats_line + "</div>" if congrats_line else ""}
             <div class="info">{count_line}</div>
-
-            <div class="registered">{registered_line}</div>
 
             <div class="step"><span class="step-done">Step 1: Registered ✓</span></div>
             <div class="step">Step 2: Pay $13.50</div>
