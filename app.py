@@ -240,9 +240,9 @@ def register(name):
             <div class="pay-prompt">Pay now to save your spot</div>
 
             <div class="buttons">
-                <a href="https://venmo.com/will_luttrell?txn=pay&amount=13.50&note=bball" target="_blank" class="pay-btn venmo">Venmo</a>
+                <a href="https://venmo.com/will_luttrell?txn=pay&amount=13.50&note=court%20fees" target="_blank" class="pay-btn venmo">Venmo</a>
                 <a href="https://cash.app/$luttrellwill/13.50" target="_blank" class="pay-btn cashapp">Cash App</a>
-                <a href="sms:+12014460400&body=Paying%20%2413.50%20for%20bball" target="_blank" class="pay-btn applepay">Apple Pay</a>
+                <a href="sms:+12014460400&body=Paying%20%2413.50%20for%20court%20fees" target="_blank" class="pay-btn applepay">Apple Pay</a>
             </div>
         </body>
     </html>
