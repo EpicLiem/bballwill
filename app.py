@@ -80,12 +80,23 @@ def is_bot(user_agent):
 def register(name):
     # Get the UNIX timestamp from query parameters, or default to epoch time (0)
     time_str = request.args.get('uid', '0')
-    
+
     try:
         # Parse the provided or default UNIX timestamp
         time_sent = datetime.datetime.utcfromtimestamp(int(time_str))
     except ValueError:
         return "Invalid UNIX timestamp. Provide the time in seconds since epoch."
+
+    # Payment amount from ?amount= (e.g. 13.5, 5, 20.99). Defaults to 13.50.
+    amount = "13.50"
+    amount_str = request.args.get('amount')
+    if amount_str:
+        try:
+            parsed = float(amount_str)
+            if parsed > 0:
+                amount = f"{parsed:.2f}"
+        except ValueError:
+            pass
 
     # Use current UTC time for the actual registration time
     ts = datetime.datetime.utcnow()
@@ -236,13 +247,13 @@ def register(name):
             <div class="info">{count_line}</div>
 
             <div class="step"><span class="step-done">Step 1: Registered ✓</span></div>
-            <div class="step">Step 2: Pay $13.50</div>
+            <div class="step">Step 2: Pay ${amount}</div>
             <div class="pay-prompt">Pay now to save your spot</div>
 
             <div class="buttons">
-                <a href="https://venmo.com/will_luttrell?txn=pay&amount=13.50&note=hoops%20fees" target="_blank" class="pay-btn venmo">Venmo</a>
-                <a href="https://cash.app/$luttrellwill/13.50" target="_blank" class="pay-btn cashapp">Cash App</a>
-                <a href="sms:+12014460400&body=Paying%20%2413.50%20for%20hoops%20fees" target="_blank" class="pay-btn applepay">Apple Pay</a>
+                <a href="https://venmo.com/will_luttrell?txn=pay&amount={amount}&note=hoops%20fees" target="_blank" class="pay-btn venmo">Venmo</a>
+                <a href="https://cash.app/$luttrellwill/{amount}" target="_blank" class="pay-btn cashapp">Cash App</a>
+                <a href="sms:+12014460400&body=Paying%20%24{amount}%20for%20hoops%20fees" target="_blank" class="pay-btn applepay">Apple Pay</a>
             </div>
         </body>
     </html>
