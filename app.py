@@ -252,7 +252,7 @@ def register(name):
 
             <div class="buttons">
                 <a href="https://venmo.com/will_luttrell?txn=pay&amount={amount}&note=hoops%20fees" target="_blank" class="pay-btn venmo">Venmo</a>
-                <a href="https://cash.app/$luttrellwill/{amount}" target="_blank" class="pay-btn cashapp">Cash App</a>
+                <a href="https://cash.app/$willscatag/{amount}" target="_blank" class="pay-btn cashapp">Cash App</a>
                 <a href="sms:+12014460400&body=Paying%20%24{amount}%20for%20hoops%20fees" target="_blank" class="pay-btn applepay">Apple Pay</a>
             </div>
         </body>
